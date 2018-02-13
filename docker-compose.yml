@@ -1,0 +1,33 @@
+version: '3.5'
+
+services:
+  siteblock-dnsmasq:
+    container_name: siteblock-dnsmasq
+    image: rossbannerman/dnsmasq:2.78
+    cap_add:
+      - NET_ADMIN
+    networks:
+      - siteblock_net
+    ports:
+      - 53:53
+      - 53:53/udp
+    volumes:
+     - ${PWD}/conf/resolv.conf:/etc/resolv.conf
+     - ${PWD}/conf/dnsmasq/dnsmasq.conf:/etc/dnsmasq.conf
+     - ${PWD}/conf/dnsmasq/siteblock.conf:/etc/dnsmasq.d/siteblock.conf
+    restart: always
+
+  siteblock-nginx:
+    container_name: siteblock-nginx
+    image: nginx:stable-alpine
+    networks:
+      - siteblock_net
+    ports:
+      - 80:80
+    volumes:
+     - ${PWD}/conf/nginx:/usr/share/nginx/html
+    restart: always
+
+networks:
+  siteblock_net:
+    name: siteblock_net
